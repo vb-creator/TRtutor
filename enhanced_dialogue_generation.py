@@ -218,7 +218,7 @@ for i, eg in enumerate(tqdm(mathdial_records[start_index:])):
         reasoner_context = {"error": str(e)}
     mathdial_records[start_index+i]['reasoner_context'] = str(reasoner_context)
     try:
-        enhanced_dialogue = enhance_dialogue(eg, reasoner_context)
+        enhanced_dialogue = enhance_dialogue(eg)
     except Exception as e:
         enhanced_dialogue = {"error": str(e)}
     mathdial_records[start_index+i]['enhanced_dialogue'] = str(enhanced_dialogue)
