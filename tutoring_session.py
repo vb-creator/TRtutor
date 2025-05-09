@@ -28,15 +28,6 @@ with open("config.yaml", "r") as f:
 
 reasoner_context_db = "tr_data/reasoner_context_tracker.json"
 
-FIREWORKS_API_KEY = keys["FIREWORKS_API_KEY"]
-client = OpenAI(api_key=FIREWORKS_API_KEY, base_url="https://api.fireworks.ai/inference/v1")
-
-URL = "https://api.fireworks.ai/inference/v1/chat/completions"
-HEADERS = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {FIREWORKS_API_KEY}"
-}
 # Load prompt templates
 TALKER_PROMPT = Path("talker_prompt.txt").read_text()
 REASONER_PROMPT = Path("reasoner_prompt.txt").read_text()
@@ -46,58 +37,8 @@ DEEPSEEK_MODEL = "deepseek-r1-basic"
 LLAMA_MODEL = "llama4-scout-instruct-basic"
 MISTRAL_MODEL = "mistral-7b-instruct-v3"
 
-# default personas
-test_personas = [
-    {
-        "name": "Aiden",
-        "gender": "male",
-        "interests": "soccer, video games, friendly competitions",
-        "personality": "outgoing, competitive, hands-on learner",
-        "background": "loves turning any activity into a game; enjoys team environments and learns best through trial and error."
-    },
-    {
-        "name": "Lila",
-        "gender": "female",
-        "interests": "drawing, music, nature walks",
-        "personality": "quiet, creative, observant",
-        "background": "expresses herself better through art and visuals than words; enjoys exploring ideas through creative storytelling."
-    },
-    {
-        "name": "Jordan",
-        "gender": "non-binary",
-        "interests": "programming, puzzles, logic games",
-        "personality": "curious, precise, enjoys deep thinking",
-        "background": "often gets absorbed in long-term projects; loves asking 'why' and breaking problems into patterns and rules."
-    },
-    {
-        "name": "Sofia",
-        "gender": "female",
-        "interests": "debate, current events, social media",
-        "personality": "confident, verbal, quick thinker",
-        "background": "thrives in discussion-based environments; likes to explain her reasoning and test ideas aloud."
-    },
-    {
-        "name": "Marcus",
-        "gender": "male",
-        "interests": "skateboarding, fixing bikes, DIY videos",
-        "personality": "active, mechanical-minded, improvisational",
-        "background": "prefers learning by doing and experimenting; gets easily bored by lectures but loves building and solving real-world problems."
-    },
-    {
-        "name": "Priya",
-        "gender": "female",
-        "interests": "reading fantasy novels, journaling, mythology",
-        "personality": "imaginative, reflective, organized",
-        "background": "absorbs information deeply; likes step-by-step thinking and often connects abstract concepts to stories or metaphors."
-    },
-    {
-        "name": "Riya",
-        "gender": "female",
-        "interests": "art, puzzles, science fiction",
-        "personality": "curious, imaginative, likes visual learning",
-        "background": "gets excited by creative problem solving and visual metaphors"
-    }
-]
+with open("tr_data/default_personas.json", "r") as f:
+        test_personas = json.load(f)
 
 
 # to set a random question to probe
@@ -111,6 +52,16 @@ def set_user_persona():
     rand_index = random.randint(0, 5)
     return test_personas[rand_index]
 
+
+FIREWORKS_API_KEY = keys["FIREWORKS_API_KEY"]
+client = OpenAI(api_key=FIREWORKS_API_KEY, base_url="https://api.fireworks.ai/inference/v1")
+
+URL = "https://api.fireworks.ai/inference/v1/chat/completions"
+HEADERS = {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {FIREWORKS_API_KEY}"
+}
 
 def generate_with_deepseek(prompt):
     payload = {

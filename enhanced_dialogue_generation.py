@@ -21,13 +21,14 @@ client = OpenAI(api_key=keys["OPENAI_API_KEY"], organization=keys["OPENAI_ORG_KE
 
 # set model
 METADATA_MODEL = "gpt-4o"     # model for metadata
-OPENAI_REASON_MODEL = "o3-mini"    # model for Aryabhata reasoning
+OPENAI_REASON_MODEL = "o3-mini"    # model for reasoning
 
 client_o3   = openai.OpenAI(api_key=keys["OPENAI_API_KEY"], organization=keys["OPENAI_ORG_KEY"])
 client_gpt4 = openai.OpenAI(api_key=keys["OPENAI_API_KEY"], organization=keys["OPENAI_ORG_KEY"])
 
-
-mathdial_df = pd.read_pickle("data/mathdial_df.pkl")
+# data_path = "data/mathdial_df.pkl"
+data_path = "data/mathdial_remaining.pkl"
+mathdial_df = pd.read_pickle(data_path)
 # determine starting record index from command-line argument
 start_index = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 
@@ -157,15 +158,6 @@ def generate_reasoner_context(example):
     except Exception:
         return resp.choices[0].message.content.strip()
 
-    # resp = client_o3.chat.completions.create(
-    #     model="o3-mini",
-    #     messages=[
-    #         {"role": "system", "content": sys},
-    #         {"role": "user",   "content": json.dumps(user, ensure_ascii=False)}
-    #     ],
-    #     temperature=0.3,
-    # )
-    # return json.loads(resp.choices[0].message.content)
 
 
 def enhance_dialogue(example):
@@ -214,7 +206,7 @@ for i, eg in enumerate(tqdm(mathdial_records[start_index:])):
         reasoner_context = generate_reasoner_context(eg)
     except Exception as e:
         print(f"{eg=}")
-        # raise
+        raise
         reasoner_context = {"error": str(e)}
     mathdial_records[start_index+i]['reasoner_context'] = str(reasoner_context)
     try:

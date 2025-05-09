@@ -4,3 +4,7 @@ data/*
 *.jsonl
 config.yaml
 logs/*
+notebooks/*
+*.csv
+*.pkl
+jobs/*
