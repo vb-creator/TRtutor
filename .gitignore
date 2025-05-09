@@ -3,3 +3,4 @@ data/*
 *.json
 *.jsonl
 config.yaml
+logs/*
