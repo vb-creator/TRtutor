@@ -153,7 +153,7 @@ def parse_deepseek(raw: str):
 
 @dataclass
 class Reasoner:
-    model_name: str  # e.g., "accounts/fireworks/models/deepseek-llm-7b-chat"
+    model_name: str # 'accounts/fireworks/models/deepseek-llm-7b-chat'
     prompt_template: str
 
     def update_context(self, question: str, student_persona: dict, conversation_history: List[dict],
@@ -252,7 +252,6 @@ if __name__ == "__main__":
     print(f"{question=}")
     print(f"Current student's persona: \n {persona=}")
 
-    print(f"{initial_context=}")
     
     # Initialize session
     # accounts/fireworks/models/qwen2p5-72b-instruct
@@ -265,7 +264,11 @@ if __name__ == "__main__":
     # First student turn
     session.student_respond(student_probe)
     print("Teacher:", session.teacher_respond())
-    
+    # to generate chain of thought and final answer
+    session.update_reasoner_context()
+
+    print(f"Context after initial probe: \n{initial_context=}")
+
     while True:
         # from second turn
         student_probe = input("Student (type 'exit' to end conversation):")

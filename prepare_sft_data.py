@@ -38,11 +38,20 @@ def prepare_sft_data(
                     "reasoner_context": reasoner_ctx,
                     "conversation_history": history
                 }
+                # sft_records.append({
+                #     "instruction": instruction,
+                #     "input": json.dumps(inp, ensure_ascii=False),
+                #     "output": turn["text"]
+                # })
                 sft_records.append({
-                    "instruction": instruction,
-                    "input": json.dumps(inp, ensure_ascii=False),
-                    "output": turn["text"]
-                })
+                "instruction": instruction,
+                "input": json.dumps(inp, ensure_ascii=False),
+                "output": turn["text"],
+                "question": row["question"],
+                "student_incorrect_solution": row["student_incorrect_solution"],
+                "teacher_described_confusion": row["teacher_described_confusion"],
+                "ground_truth": row["ground_truth"]
+            })
             # Add every turn to history for next example
             history.append(turn)
 
@@ -61,11 +70,10 @@ def prepare_sft_data(
 
 
 # usage
-"""
+
 prepare_sft_data(
     enhanced_pkl="tr_data/enhanced_mathdial_conversations.pkl",
     talker_prompt_path="sft_talker_prompt.txt",
-    output_pickle="tr_data/mathdial_sft.pkl",
-    output_jsonl="tr_data/mathdial_sft.jsonl"
+    output_pickle="tr_data/mathdial_sft_extended.pkl",
+    output_jsonl="tr_data/mathdial_sft_extended.jsonl"
 )
-"""
