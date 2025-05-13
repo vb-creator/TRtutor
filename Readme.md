@@ -55,15 +55,15 @@ This repository contains code to train and deploy a Socratic 'talker-reasoner' f
 
 ## Dataset Generation
 
-Use `scripts/dataset_generation.py` to turn your raw problem files into JSON records:
+Use `dataset_generation/enhanced_dialogue_generation.py` to generate reasoner_context and personalized conversation dataset using openAI models.
 
 ```bash
-python scripts/dataset_generation.py \
-  --input_dir data/raw/ \
-  --output_json data/tr_data/train_mathdial.json
+python dataset_generation/enhanced_dialogue_generation.py \
+  --input_dir data/mathdial_df.pkl \
+  --output_json tr_data/train_mathdial.json
 ```
 
-Each record will include:
+Use `dataset_generation/prepare_sft_data.py` to format the dataset for SFT,
 
 * `instruction`: the talker prompt template
 * `input`: JSON with `student_persona`, `reasoner_context`, `conversation_history`
