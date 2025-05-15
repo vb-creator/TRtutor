@@ -4,8 +4,8 @@ This repository contains code to train and deploy a Socratic 'talker-reasoner' f
 
 * **Dataset Generation**: Scripts to generate training dataset with Talker-reasoner enhanced dialogues from raw mathdial conversation samples.
 * **Reasoner Context Generation**: Code to generate chain of thought, belief state, and final answers for each problem using SOTA reasoner models like o3-mini, deepseek-r1.
-* **Talker Fine‑tuning**: `sft_talker.py` to run supervised fine‑tuning with LoRA adapters.
-* **Inference**: `talker_predict.py` to generate tutor responses at inference time.
+* **Talker Fine‑tuning**: `finetuning_sft_talker.py` to run supervised fine‑tuning with LoRA adapters.
+* **Inference**: `inference/talker_predict.py` to generate tutor responses at inference time.
 
 ---
 
@@ -73,7 +73,7 @@ Use `dataset_generation/prepare_sft_data.py` to format the dataset for SFT,
 
 ## Reasoner Context Generation
 
-Compute chain of thought, belief state, and final answer with:
+Compute chain of thought, belief state, and final answer using OpenAI (API key), Deepseek-R1 (using Fireworks API key):
 
 ```bash
 python scripts/reasoner_context_generation.py \
@@ -82,13 +82,13 @@ python scripts/reasoner_context_generation.py \
   --output_json data/tr_data/train_mathdial.json
 ```
 
-This enriches each record’s `input.reasoner_context`.
+This enriches talker's shared context using `reasoner_context`.
 
 ---
 
 ## Talker Fine‑tuning
 
-Run `finetuning/sft_talker.py` under `torchrun`:
+Run `finetuning/sft_talker.py` with `torchrun` below command requires access to 2 GPUs:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc-per-node=2 finetuning/sft_talker.py \
@@ -122,7 +122,7 @@ python inference/talker_predict.py \
   --output_json data/tr_data/predictions.json
 ```
 
-This will load the merged LoRA adapter and emit a plain-text teacher reply for each example.
+This will load the saved model checkpoint and generate next best teacher dialogue for the given conversation history.
 
 ---
 
