@@ -1,4 +1,4 @@
-# Talker Tutor Repository
+# TRTutor: Talker-Reasoner Math Tutor
 
 This repository contains code to train and deploy a Socratic 'talker-reasoner' framework to implement a math tutor. It includes,
 
