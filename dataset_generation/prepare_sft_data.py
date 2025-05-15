@@ -69,7 +69,6 @@ def prepare_sft_data(
         print(f"Also saved JSONL to {output_jsonl}")
 
 
-# usage
 
 prepare_sft_data(
     enhanced_pkl="tr_data/enhanced_mathdial_conversations.pkl",

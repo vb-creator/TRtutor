@@ -10,12 +10,11 @@ import time
 
 # ——— PREPROCESS FUNCTION ———
 def preprocess(ex, args, tokenizer):
-    prompt = ex["instruction"].strip() + "\n\n" + ex["input"].strip() + "\n\n"
+    prompt = ex["input_prompt"].strip() + "\n"
     resp   = ex["output"].strip()
     pids   = tokenizer(prompt,   add_special_tokens=False).input_ids
     rids   = tokenizer(resp,     add_special_tokens=False).input_ids
     ids     = (pids + rids)[: args.model_max_length]
-    # labels = -100 on prompt, actual on response
     labs    = [-100] * len(pids) + rids
     labs    = labs[: len(ids)]
     # pad to max_length
@@ -38,7 +37,6 @@ def main():
     p.add_argument("--max_new_tokens", type=int, default=80)
     args = p.parse_args()
 
-    # — load adapter config & base model
     cfg = PeftConfig.from_pretrained(args.adapter_path)
     base = cfg.base_model_name_or_path
     tokenizer = AutoTokenizer.from_pretrained(args.adapter_path, padding_side="right", use_fast=True)
@@ -55,7 +53,7 @@ def main():
     latest_file_path = args.output_json.strip(".json")+'_latest.json'
 
     for ex in tqdm(test_data):
-        prompt = ex["instruction"].strip() + "\n\n" + ex["input"].strip() + "\n\n"
+        prompt = ex["input_prompt"].strip() + "\n"
         start_time = time.time()
         tokens = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to(model.device)
         gen = model.generate(
@@ -83,8 +81,6 @@ if __name__ == "__main__":
     main()
 
 # python talker_predict.py \
-#   --adapter_path ~/exp_medmcqa/trt_qwen_2point5_7b_latest \
+#   --adapter_path finetuned_models/trt_qwen_2point5_7b_latest \
 #   --test_json tr_data/test_mathdial.json \
-#   --output_json tr_data/predictions.json
-    
-# python talker_predict.py   --adapter_path ~/exp_medmcqa/trt_qwen_2point5_7b_latest/checkpoint-150   --test_json tr_data/test_mathdial_extended.json   --output_json tr_data/predictions_qwen_2point5_7b.json 2>&1 | tee logs/test_qwen_talker.log
+#   --output_json tr_data/predictions_qwen_7b.json

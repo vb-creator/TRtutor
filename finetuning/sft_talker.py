@@ -17,6 +17,13 @@ from transformers import (
 from peft import LoraConfig, TaskType
 from unsloth import FastLanguageModel
 
+import os, torch
+
+# # In a torchrun ddp launch, LOCAL_RANK tells you which GPU this process owns
+# local_rank = int(os.environ.get("LOCAL_RANK", 0))
+# torch.cuda.set_device(local_rank)
+
+
 # ——— ARGPARSE ———
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_name",    required=True)
@@ -53,18 +60,15 @@ logger = logging.getLogger(__name__)
 logger.info(f"Training {args.model_name} → {args.output_dir}")
 
 # ——— LOAD DATAFRAME ———
-assert args.data_path.endswith(".json")
-df = pd.read_json(args.data_path)
-# else:
-#     df = pd.read_pickle(args.data_path)
-# val_df = pd.read_json(args.val_path) if args.val_path
-# and args.val_path.endswith(".json") else (
-        #  pd.read_pickle(args.val_path) if args.val_path else None)
-# train_df, eval_df = (
-#     train_test_split(df, test_size=0.2, random_state=42))
-# 80/20 train‑val split
-train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
+# assert args.data_path.endswith(".json")
+if args.data_path:
+    df = pd.read_json(args.data_path)
+else:
+    df = pd.read_json("tr_data/train_mathdial.json")
 
+
+# train and validation with 80-20 splits
+train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
 
 # ——— DATASET → HF Dataset ———
 train_ds = Dataset.from_pandas(train_df.reset_index(drop=True))
@@ -76,7 +80,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     cache_dir     = args.cache_dir,
     max_seq_length= args.model_max_length,
     dtype         = torch.bfloat16 if args.bf16 else torch.float16,
-    load_in_4bit  = args.low_rank_training, #false
+    # load_in_4bit  = args.low_rank_training, #false
 )
 FastLanguageModel.for_training(model)
 
@@ -92,7 +96,7 @@ model.print_trainable_parameters()
 
 # ——— PREPROCESS FUNCTION ———
 def preprocess(ex):
-    prompt = ex["instruction"].strip() + "\n\n" + ex["input"].strip() + "\n\n"
+    prompt = ex["input_prompt"].strip() + "\n\n"
     resp   = ex["output"].strip()
     pids   = tokenizer(prompt,   add_special_tokens=False).input_ids
     rids   = tokenizer(resp,     add_special_tokens=False).input_ids
@@ -135,7 +139,7 @@ training_args = TrainingArguments(
     logging_dir                 = os.path.join(args.output_dir, "logs"),
     report_to                   = "wandb",
     run_name                    = f"{os.path.basename(args.output_dir)}_{datetime.now():%Y%m%d_%H%M%S}",
-    # deepspeed                   = args.deepspeed # use it in case of multi-gpu access to speed up finetuning
+    deepspeed                   = args.deepspeed
 )
 
 # ——— WANDB & TRAINER ———
@@ -150,5 +154,11 @@ trainer = Trainer(
     data_collator  = default_data_collator,
 )
 # trainer.train()
-trainer.train(resume_from_checkpoint=args.resume_from_checkpoint)
+
+if args.resume_from_checkpoint:
+    trainer.train(resume_from_checkpoint=args.resume_from_checkpoint)
+else:
+    trainer.train()
+# trainer.train(resume_from_checkpoint=args.resume_from_checkpoint)
 wandb.finish()
+

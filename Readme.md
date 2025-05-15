@@ -95,7 +95,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc-per-node=2 finetuning/sft_talker.py \
   --model_name Qwen/Qwen2.5-7B-Instruct \
   --bf16 \
   --data_path data/tr_data/train_mathdial.json \
-  --output_dir exp_medmcqa/trt_qwen_2point5_7b \
+  --output_dir finetuned_models/trt_qwen_2point5_7b \
   --cache_dir data/cache \
   --model_max_length 2048 \
   --per_device_train_batch_size 2 \
@@ -117,7 +117,7 @@ Generate tutor responses with `inference/talker_predict.py`:
 
 ```bash
 python inference/talker_predict.py \
-  --adapter_path exp_medmcqa/trt_qwen_2point5_7b \
+  --adapter_path finetuned_models/trt_qwen_2point5_7b \
   --test_json data/tr_data/test_mathdial.json \
   --output_json data/tr_data/predictions.json
 ```
