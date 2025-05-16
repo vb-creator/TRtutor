@@ -158,7 +158,7 @@ class Student:
     MAX_TURNS = 8  # teacher+student turns per question
     STUDENT_MISTAKE_PROB = 1  # 30 % chance student makes a wrong calc
 
-    client = genai.Client(api_key="AIzaSyCC3eAo7y3Toa-iqn68vHX4TCFVdwMzTf4")
+    client = genai.Client(api_key="")
     def gen_student_prompt(self, student_persona: dict, history: List[dict]) -> str:
         history = [f"{msg['speaker']}: {msg['text']}" for msg in history]
         history_block = "\n".join(history)
