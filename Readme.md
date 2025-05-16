@@ -7,6 +7,7 @@ This repository contains code to train and deploy a Socratic 'talker-reasoner' f
 * **Talker Fine‑tuning**: `finetuning_sft_talker.py` to run supervised fine‑tuning with LoRA adapters.
 * **Inference**: `inference/talker_predict.py` to generate tutor responses at inference time.
 
+The datasets used for finetuning, and the inference results, and conversation simulations generated for LLM-based evaluation can be found [here]([url](https://drive.google.com/drive/folders/1sRF0oFmicJ-fBqd-GTC4I9vFAToHhZdG?usp=drive_link))
 ---
 
 <!-- ## Repository Structure
