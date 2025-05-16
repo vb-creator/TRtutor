@@ -11,8 +11,12 @@ from google import genai
 from google.genai import types
 import pandas as pd
 from pathlib import Path
+import yaml
+# OPENAI API key
+with open("config.yaml", "r") as f:
+    keys = yaml.safe_load(f)
 
-
+OPENAI_API_KEY = keys['OPENAI_API_KEY']
 
 TALKER_PROMPT = Path("talker_prompt.txt").read_text()
 REASONER_PROMPT = Path("reasoner_prompt.txt").read_text()
@@ -241,7 +245,7 @@ for row in first_5_rows:
     # Initialize Tutor components
     # talker = Talker(model_path="Saved_Models/qwen_7b_checkpoint_150/", prompt_template=TALKER_PROMPT)
     talker = None
-    reasoner = Reasoner(api_key="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",
+    reasoner = Reasoner(api_key=OPENAI_API_KEY,
                         prompt_template=REASONER_PROMPT)
     tutor = Tutor(talker=talker, reasoner=reasoner, question=question, student_persona=student_persona, reasoner_context={})
     # Start conversation
